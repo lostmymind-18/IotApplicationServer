@@ -1,8 +1,6 @@
 from multiprocessing import Manager
 from flask import Flask,render_template, request
 from flask_mysqldb import MySQL
-import time
-import datetime
 #from flask_script import Manager
 
  
@@ -16,22 +14,20 @@ app.config['MYSQL_DB'] = 'IotServer'
  
 mysql = MySQL(app)
  
-@app.route('/form')
-def form():
-    return render_template('form.html')
- 
-@app.route('/login', methods = ['POST', 'GET'])
+@app.route('/', methods = ['GET'])
 def login():
     if request.method == 'GET':
-        return "Login via the login Form"
-     
-    if request.method == 'POST':
-        ts = time.time()
-        timestamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-        cursor = mysql.connection.cursor()
-        cursor.execute(''' INSERT INTO info (time,temp,humid,gas) VALUES(%s,%s,%s,%s)''',(timestamp,34.545,234.53,123.4))
-        mysql.connection.commit()
-        cursor.close()
-        return f"Done!!"
+        #while True:
+            cursor = mysql.connection.cursor()
+            cursor.execute(''' SELECT * FROM info ORDER BY time DESC LIMIT 1''')
+            result = cursor.fetchall()[0]
+            temp = result[1]
+            humid = result[2]
+            gas = result[3]
+            light = result[4]
+            mysql.connection.commit()
+            cursor.close()
+            return render_template('page.html',temp=temp,
+                humid=humid,gas=gas,light=light)
 if __name__=='__main__': 
     app.run(host='localhost', port=5000)
