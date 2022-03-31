@@ -1,12 +1,18 @@
+from multiprocessing import Manager
 from flask import Flask,render_template, request
 from flask_mysqldb import MySQL
+import time
+import datetime
+#from flask_script import Manager
+
  
 app = Flask(__name__)
+#manager = Manager(app)
  
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'flask'
+app.config['MYSQL_PASSWORD'] = '123456'
+app.config['MYSQL_DB'] = 'IotServer'
  
 mysql = MySQL(app)
  
@@ -20,12 +26,12 @@ def login():
         return "Login via the login Form"
      
     if request.method == 'POST':
-        name = request.form['name']
-        age = request.form['age']
+        ts = time.time()
+        timestamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
         cursor = mysql.connection.cursor()
-        cursor.execute(''' INSERT INTO info_table VALUES(%s,%s)''',(name,age))
+        cursor.execute(''' INSERT INTO info (time,temp,humid,gas) VALUES(%s,%s,%s,%s)''',(timestamp,34.545,234.53,123.4))
         mysql.connection.commit()
         cursor.close()
         return f"Done!!"
- 
-app.run(host='localhost', port=5000)
+if __name__=='__main__': 
+    app.run(host='localhost', port=5000)
