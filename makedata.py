@@ -2,7 +2,7 @@ import mysql.connector
 import random
 import time
 
-cnx = mysql.connector.connect(user='root', password='123456',
+cnx = mysql.connector.connect(user='root', password='12345678',
                               host='localhost',
                               database='IotServer')
 cursor = cnx.cursor()
