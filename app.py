@@ -7,7 +7,7 @@ from random import random
 from flask import Flask, render_template, make_response
 from Adafruit_IO import Client, Feed
 
-ADAFRUIT_IO_KEY = 'aio_ltME63D0sGreFExWCaXgf3Xft2K4'
+ADAFRUIT_IO_KEY = 'aio_omRU24MZwW4FwXEHyzg2wl1MjPxA'
 
 # Set to your Adafruit IO username.
 # (go to https://accounts.adafruit.com to find your username)
