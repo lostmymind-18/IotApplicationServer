@@ -70,6 +70,46 @@
 
     </style>
 
+    <style type="text/css">
+        #door{
+            margin-left:6.5%;
+		    width: 15%;
+		    height: 250px;
+		    text-align: center;
+		    font-size: 250%;
+		    padding-top: px;
+            float:left;
+        }
+
+        #gas{
+            margin-left:21%;
+		    width: 15%;
+		    height: 250px;
+		    text-align: center;
+		    font-size: 250%;
+		    padding-top: px;
+            float:left;
+        }
+
+        #light{
+            margin-left:21%;
+		    width: 15%;
+		    height: 250px;
+		    text-align: center;
+		    font-size: 250%;
+		    padding-top: px;
+            float:left;
+        }
+
+        .hot{
+            background-color: red;
+        }
+
+        .cold{
+            background-color: green;
+        }
+    </style>
+
     <div class="container-fluid">
         <!-- Example row of columns -->
         <div class="row">
@@ -90,12 +130,27 @@
             </div>
         </div>
     </div>
+    <div id="door" class="cold">
+        Door<br><br>
+        <em></em>
+    </div>
 
+    <div id="gas" class="cold">
+        Gas<br><br>
+        <em></em>
+    </div>
+
+    <div id="light" class="cold">
+        Light<br><br>
+        <em></em>
+    </div>
 
     <script>
         var chartTemperatue;
         var chartHumidity;
-
+        var door;
+        var gas;
+        var light;
         function requestData()
         {
             // Ajax call to get the Data from Flask
@@ -116,7 +171,7 @@
                 var data1 = [];
                 data1.push(result[0]);
                 data1.push(result[1]);
-
+                
 
                 // Add the Point
                 // Time Humidity
@@ -124,7 +179,9 @@
                 data2.push(result[0]);
                 data2.push(result[2]);
 
-
+                door = result[3];
+                gas = result[4];
+                light = result[5];
                 chartTemperatue.series[0].addPoint(data1, true, shiftTemperature);
                 chartHumidity.series[0].addPoint(data2, true, shiftHumidity);
                 $(".sensor1").text("");
@@ -132,9 +189,47 @@
 
                 $(".sensor2").text("");
                 $(".sensor2").text("Humidity : " +  Math.round(data2[1]) );
+                
 
+                //Check door
+                if(door>0)
+                {
+                    var el = document.getElementById('door');
+                    el.className = 'cold';
+                    el.lastChild.nodeValue = 'Opened';
+                }
+                else{
+                    var el = document.getElementById('door')
+                    el.className = 'hot ';
+                    el.lastChild.nodeValue = 'Closed';
+                }
+
+                //Gas
+                {
+                    var el = document.getElementById('gas');
+                    el.lastChild.nodeValue = gas;
+                    if(gas>=300){
+                        el.className = 'hot';
+                    }
+                    else{
+                        el.className = 'cold';
+                    }
+                }
+
+                //Light
+                {
+                    var el = document.getElementById('light');
+                    if(light == 'LED_ON'){
+                        el.className = 'cold';
+                        el.lastChild.nodeValue = 'Turned on';
+                    }
+                    else if(light == 'LED_OFF'){
+                        el.className = 'hot';
+                        el.lastChild.nodeValue = 'Turned off';
+                    }
+                }
                 // call it again after one second
-                setTimeout(requestData, 1000);
+                setTimeout(requestData, 2000);
 
             });
         }
@@ -212,6 +307,44 @@
 
 
         });
+        var door = document.getElementById('door');
+        var light = document.getElementById('light');
+        door.onclick = function(){
+            var mydata;
+            if (door == 0)
+            {
+                mydata = 1;
+            }
+            else if(door > 0)
+            {
+                mydata = 0;
+            }
+            $.ajax({
+                type: 'POST',
+                url: '/door',
+                contentType: 'application/json;charset=UTF-8',
+                data: JSON.stringify(mydata),
+                dataType:'json',
+            });
+        };
+        light.onclick = function(){
+            var mydata;
+            if (light == 'LED_ON')
+            {
+                mydata = 'LED_OFF';
+            }
+            else if(light == 'LED_OFF')
+            {
+                mydata = 'LED_ON';
+            }
+            $.ajax({
+                type: 'POST',
+                url: '/light',
+                contentType: 'application/json;charset=UTF-8',
+                data: JSON.stringify(mydata),
+                dataType:'json',
+            });
+        };
     </script>
 
 
